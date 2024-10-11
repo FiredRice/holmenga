@@ -1,0 +1,1 @@
+wails build -clean -platform=windows -webview2=embed
