@@ -50,8 +50,8 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
 
     const onDragEnd = ({ active, over }: DragEndEvent) => {
         if (active.id !== over?.id) {
-            const activeIndex = value.findIndex((i) => i.Hash === active.id);
-            const overIndex = value.findIndex((i) => i.Hash === over?.id);
+            const activeIndex = value.findIndex((i) => i.Name === active.id);
+            const overIndex = value.findIndex((i) => i.Name === over?.id);
             onChange?.(arrayMove(value, activeIndex, overIndex));
         }
     };
@@ -152,7 +152,7 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
     return (
         <DndContext sensors={sensors} modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
             <SortableContext
-                items={value.map(i => i.Hash)}
+                items={value.map(i => i.Name)}
                 strategy={verticalListSortingStrategy}
             >
                 <Image.PreviewGroup
@@ -160,7 +160,7 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
                     items={value.map(f => `wails-local/${dir}/${f.Name}`)}
                 >
                     <Table
-                        rowKey='Hash'
+                        rowKey='Name'
                         className='manage-table'
                         size='small'
                         components={{

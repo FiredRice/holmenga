@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	"io"
 	"io/fs"
 	"net/http"
@@ -14,8 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
-
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type File struct {
@@ -85,7 +84,7 @@ func (f *File) GetFilesInfo(dir string) ([]FileInfo, error) {
 				Name:           f.Name(),
 				ModTime:        f.ModTime().Unix(),
 				Size:           f.Size(),
-				Hash:           md5Hash,
+				Hash:           md5Hash + "_" + f.Name(),
 				CreationTime:   creationTime,
 				LastAccessTime: lastAccessTime,
 				LastWriteTime:  lastWriteTime,

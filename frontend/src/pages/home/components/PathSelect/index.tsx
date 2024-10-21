@@ -20,7 +20,9 @@ const PathSelect: React.FC<IPathSelectProps> = (props) => {
 
     async function onClick() {
         try {
-            const path = await OpenDirectory({} as any);
+            const path = await OpenDirectory({
+                DefaultDirectory: value
+            } as any);
             onChange?.(path);
         } catch (error) {
             console.log(error);
