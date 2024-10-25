@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
-import { Button, Input, Space } from 'antd';
+import { Button, Input, message, Space } from 'antd';
 import { OpenDirectory } from 'wailsjs/go/dialog/Dialog';
 import { useSafeState } from 'ahooks';
+import { PathExists, Dir } from 'wailsjs/go/path/Path';
 import { GetFilesInfo } from 'wailsjs/go/file/File';
 import { file } from 'wailsjs/go/models';
 
@@ -18,14 +19,32 @@ const PathSelect: React.FC<IPathSelectProps> = (props) => {
 
     const [loading, setLoading] = useSafeState<boolean>(false);
 
+    async function getDefaultPath(path: string) {
+        let p = path.replaceAll('\\', '/');
+        while (!!p) {
+            try {
+                const exist = await PathExists(p);
+                if (exist) {
+                    return p;
+                }
+                p = await Dir(p);
+            } catch (error) {
+                console.log(error);
+                return '';
+            }
+        }
+        return p;
+    }
+
     async function onClick() {
         try {
+            const defaultPath = await getDefaultPath(value);
             const path = await OpenDirectory({
-                DefaultDirectory: value
+                DefaultDirectory: defaultPath || undefined
             } as any);
             onChange?.(path);
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
+            message.error(error);
         }
     }
 

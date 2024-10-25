@@ -1,14 +1,15 @@
 package main
 
 import (
-	"holmenga/src/core"
-	"holmenga/src/dialog"
-	"holmenga/src/file"
 	"embed"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
+	"holmenga/src/core"
+	"holmenga/src/dialog"
+	"holmenga/src/file"
+	"holmenga/src/path"
 )
 
 //go:embed all:frontend/dist
@@ -37,6 +38,7 @@ func main() {
 			app,
 			file.New(app.Context()),
 			dialog.New(app.Context()),
+			path.New(app.Context()),
 		},
 		Windows: &windows.Options{
 			WebviewUserDataPath: "./cache",
