@@ -1,10 +1,13 @@
-import { Card, Form, message, Switch } from 'antd';
+import { useState } from 'react';
+import { Card, FloatButton, Form, message, Switch } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import PathSelect from './components/PathSelect';
 import { BathRename, ZipFolder } from 'wailsjs/go/file/File';
 import { file } from 'wailsjs/go/models';
 import ManageTable from './components/ManageTable';
 import { useSafeState } from 'ahooks';
 import { Footer, Header, Page } from 'src/components';
+import QuickPreview from './components/QuickPreview';
 import './style/index.less';
 
 function Home() {
@@ -12,11 +15,12 @@ function Home() {
 	const [form] = Form.useForm();
 
 	const [loading, setLoading] = useSafeState<boolean>(false);
+	const [visible, setVisible] = useState<boolean>(false);
 
 	function isImg(name: string) {
 		const support = ['.png', '.jpg', '.webp', '.jpeg'];
 		for (const suffix of support) {
-			if (name.endsWith(suffix)) {
+			if (name.toLocaleLowerCase().endsWith(suffix)) {
 				return true;
 			}
 		}
@@ -128,6 +132,10 @@ function Home() {
 							);
 						}}
 					</Form.Item>
+					<QuickPreview
+						open={visible}
+						onClose={() => setVisible(false)}
+					/>
 				</Form>
 			</Card>
 			<Footer>
@@ -139,6 +147,12 @@ function Home() {
 					执行
 				</Footer.Button>
 			</Footer>
+			<FloatButton
+				className='quick-button'
+				type='primary'
+				icon={<SearchOutlined />}
+				onClick={() => setVisible(true)}
+			/>
 		</Page>
 	);
 }
