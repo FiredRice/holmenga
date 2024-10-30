@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Card, FloatButton, Form, message, Switch } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import PathSelect from './components/PathSelect';
@@ -31,6 +31,25 @@ function Home() {
 		form.setFieldsValue({
 			images: files.filter(f => isImg(f.Name))
 		});
+	}
+
+	const onQuickClick = useCallback((v: file.FileInfo) => {
+		const target = document.querySelector(`[data-row-key="${v.Name}"]`);
+		if (!target) return;
+		setVisible(false);
+		target.scrollIntoView({
+			behavior: 'smooth',
+			block: 'center'
+		});
+	}, []);
+
+	function onPreview() {
+		const images: file.FileInfo[] = form.getFieldValue('images') || [];
+		if (!images.length) {
+			message.error('未找到图片');
+			return;
+		}
+		setVisible(true);
 	}
 
 	async function onFinish(values) {
@@ -123,7 +142,7 @@ function Home() {
 							const dir = getFieldValue('dir') || '';
 							return (
 								<Form.Item
-									label='管理'
+									label='图片列表'
 									initialValue={[]}
 									name='images'
 								>
@@ -134,6 +153,7 @@ function Home() {
 					</Form.Item>
 					<QuickPreview
 						open={visible}
+						onItemClick={onQuickClick}
 						onClose={() => setVisible(false)}
 					/>
 				</Form>
@@ -151,7 +171,7 @@ function Home() {
 				className='quick-button'
 				type='primary'
 				icon={<SearchOutlined />}
-				onClick={() => setVisible(true)}
+				onClick={onPreview}
 			/>
 		</Page>
 	);

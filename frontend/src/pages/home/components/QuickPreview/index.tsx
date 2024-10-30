@@ -1,15 +1,16 @@
 import React, { useMemo, useState } from 'react';
-import { Card, Flex, Form, Image, Drawer, DrawerProps, Select } from 'antd';
+import { Card, Flex, Form, Drawer, DrawerProps, Select } from 'antd';
 import { file } from 'wailsjs/go/models';
 import LocalImage from '../LocalImage';
 import './style/index.less';
 
 interface IQuickPreviewProps extends DrawerProps {
+    onItemClick?: (v: file.FileInfo, i: number) => void;
 }
 
 const QuickPreview: React.FC<IQuickPreviewProps> = React.memo((props) => {
 
-    const { ...otherProps } = props;
+    const { onItemClick, ...otherProps } = props;
 
     const [columnNum, setColumnNum] = useState<number>(3);
 
@@ -39,24 +40,20 @@ const QuickPreview: React.FC<IQuickPreviewProps> = React.memo((props) => {
             }
             {...otherProps}
         >
-            <Image.PreviewGroup
-                preview
-                items={images.map(f => `wails-local/${dir}/${f.Name}`)}
-            >
-                <Flex wrap gap={12}>
-                    {images.map((v, i) => (
-                        <Card
-                            key={v.Name}
-                            className='prev-card'
-                            style={{ width: cardWidth }}
-                            hoverable
-                            cover={<LocalImage src={`${dir}/${v.Name}`} />}
-                        >
-                            <Card.Meta className='tc' title={i + 1} />
-                        </Card>
-                    ))}
-                </Flex>
-            </Image.PreviewGroup>
+            <Flex wrap gap={12}>
+                {images.map((v, i) => (
+                    <Card
+                        key={v.Name}
+                        className='prev-card'
+                        style={{ width: cardWidth }}
+                        hoverable
+                        onClick={() => onItemClick?.(v, i)}
+                        cover={<LocalImage preview={false} src={`${dir}/${v.Name}`} />}
+                    >
+                        <Card.Meta className='tc' title={i + 1} />
+                    </Card>
+                ))}
+            </Flex>
         </Drawer>
     );
 });
