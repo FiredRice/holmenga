@@ -9,6 +9,7 @@ import SortRow from '../SortRow';
 import { file } from 'wailsjs/go/models';
 import dayjs from 'dayjs';
 import { SortType, useSorters } from './hooks/useSorter';
+import EditableCell from '../EditableCell';
 import './style/index.less';
 
 const Tr: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = (props) => {
@@ -34,7 +35,7 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
     }
 
     const [sorters, sortState] = useSorters<file.FileInfo>([
-        'Name', 
+        'Name',
         'ModTime',
         'CreationTime',
         'LastAccessTime'
@@ -58,9 +59,26 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
 
     function millisecondsFormat(value: number) {
         if (!!value) {
-            return dayjs(value / 1000000).format('YYYY-MM-DD HH:mm:ss')
+            return dayjs(value / 1000000).format('YYYY-MM-DD HH:mm:ss');
         }
-        return '--'
+        return '--';
+    }
+
+    function onQuickSort(current: number, target: number) {
+        let overIndex = target - 1;
+        if (overIndex >= value.length) {
+            overIndex = value.length - 1;
+        }
+        const list = arrayMove(value, current - 1, overIndex);
+        onChange?.(list);
+        setTimeout(() => {
+            const target = document.querySelector(`[data-row-key="${list[overIndex].Name}"]`);
+            if (!target) return;
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }, 0);
     }
 
     const columns = useMemo(() => [
@@ -70,7 +88,11 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
             align: 'center',
             fixed: 'left',
             width: 80,
-            render: (_text, _record, index) => index + 1
+            render: (_text, _record, index) => (
+                <EditableCell onSave={v => onQuickSort(index + 1, v)}>
+                    {index + 1}
+                </EditableCell>
+            )
         },
         {
             title: '名称',
@@ -119,7 +141,7 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
             width: 160,
             render: millisecondsFormat
         },
-    ] as TableProps<file.FileInfo>['columns'], [dir, sorters]);
+    ] as TableProps<file.FileInfo>['columns'], [value]);
 
     useEffect(() => {
         const { orderField, orderType } = sortState;
