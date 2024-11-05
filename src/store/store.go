@@ -12,7 +12,6 @@ type Store struct {
 }
 
 var defaultStore = &WindowsStore{Log: false}
-
 var windowStorePath = "data/windows.json"
 
 func NewStore() (*Store, error) {

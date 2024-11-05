@@ -1,13 +1,15 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card, FloatButton, Form, message, Switch } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import PathSelect from './components/PathSelect';
 import { BathRename, ZipFolder } from 'wailsjs/go/file/File';
-import { file } from 'wailsjs/go/models';
+import { EventsOn, EventsOff } from 'wailsjs/runtime';
 import ManageTable from './components/ManageTable';
 import { useSafeState } from 'ahooks';
 import { Footer, Header, Page } from 'src/components';
 import QuickPreview from './components/QuickPreview';
+import { FileInfo } from 'src/types';
+import config from 'src/service/config';
 import './style/index.less';
 
 function Home() {
@@ -16,6 +18,15 @@ function Home() {
 
 	const [loading, setLoading] = useSafeState<boolean>(false);
 	const [visible, setVisible] = useState<boolean>(false);
+
+	useEffect(() => {
+		EventsOn('scroll-anim-chenge', function (v: boolean) {
+			config.scrollAnim = v;
+		});
+		return () => {
+			EventsOff('scroll-anim-chenge');
+		};
+	}, []);
 
 	function isImg(name: string) {
 		const support = ['.png', '.jpg', '.webp', '.jpeg'];
@@ -27,24 +38,27 @@ function Home() {
 		return false;
 	}
 
-	function onFilesLoad(files: file.FileInfo[]) {
+	function onFilesLoad(files: FileInfo[]) {
 		form.setFieldsValue({
 			images: files.filter(f => isImg(f.Name))
 		});
 	}
 
-	const onQuickClick = useCallback((v: file.FileInfo) => {
+	const onQuickClick = useCallback((v: FileInfo) => {
 		const target = document.querySelector(`[data-row-key="${v.Name}"]`);
 		if (!target) return;
 		setVisible(false);
+		/**
+		 * 屮艸芔茻，鬼知道为啥不用 as 断言类型会报错啊
+		 */
 		target.scrollIntoView({
-			behavior: 'smooth',
+			behavior: config.scrollAnim ? 'smooth' : 'instant' as ScrollBehavior,
 			block: 'center'
 		});
 	}, []);
 
 	function onPreview() {
-		const images: file.FileInfo[] = form.getFieldValue('images') || [];
+		const images: FileInfo[] = form.getFieldValue('images') || [];
 		if (!images.length) {
 			message.error('未找到图片');
 			return;

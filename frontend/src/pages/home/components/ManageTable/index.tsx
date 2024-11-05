@@ -1,15 +1,17 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Table, TableProps, Typography, Image } from 'antd';
+import { Table, TableProps, Typography, Image, Modal, message } from 'antd';
 import LocalImage from '../LocalImage';
 import type { DragEndEvent } from '@dnd-kit/core';
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortRow from '../SortRow';
-import { file } from 'wailsjs/go/models';
+import { Remove } from 'wailsjs/go/file/File';
 import dayjs from 'dayjs';
 import { SortType, useSorters } from './hooks/useSorter';
 import EditableCell from '../EditableCell';
+import { FileInfo } from 'src/types';
+import config from 'src/service/config';
 import './style/index.less';
 
 const Tr: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = (props) => {
@@ -20,21 +22,21 @@ const Tr: React.FC<React.HTMLAttributes<HTMLTableRowElement>> = (props) => {
 
 interface IManageTableProps {
     dir?: string;
-    value?: file.FileInfo[];
-    onChange?: (value: file.FileInfo[]) => void;
+    value?: FileInfo[];
+    onChange?: (value: FileInfo[]) => void;
 }
 
 const ManageTable: React.FC<IManageTableProps> = (props) => {
 
     const { dir = '', value = [], onChange } = props;
 
-    const defaultValue = useRef<file.FileInfo[]>([]);
+    const defaultValue = useRef<FileInfo[]>([]);
 
     if (defaultValue.current.length !== value.length) {
         defaultValue.current = value;
     }
 
-    const [sorters, sortState] = useSorters<file.FileInfo>([
+    const [sorters, sortState] = useSorters<FileInfo>([
         'Name',
         'ModTime',
         'CreationTime',
@@ -75,10 +77,32 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
             const target = document.querySelector(`[data-row-key="${list[overIndex].Name}"]`);
             if (!target) return;
             target.scrollIntoView({
-                behavior: 'smooth',
+                behavior: config.scrollAnim ? 'smooth' : 'instant' as ScrollBehavior,
                 block: 'center'
             });
         }, 0);
+    }
+
+    function onRemove(file: FileInfo) {
+        Modal.confirm({
+            title: '操作提示',
+            type: 'warning',
+            content: `确认删除图片【${file.Name}】吗？`,
+            maskClosable: true,
+            onOk: async () => {
+                try {
+                    await Remove(`${dir}/${file.Name}`);
+                    const index = value.findIndex((i) => i.Name === file.Name);
+                    const list = [...value];
+                    list.splice(index, 1);
+                    onChange?.(list);
+                    message.success('删除成功');
+                } catch (error: any) {
+                    message.success(error);
+                    console.log(error);
+                }
+            }
+        });
     }
 
     const columns = useMemo(() => [
@@ -141,7 +165,19 @@ const ManageTable: React.FC<IManageTableProps> = (props) => {
             width: 160,
             render: millisecondsFormat
         },
-    ] as TableProps<file.FileInfo>['columns'], [value]);
+        {
+            title: '操作',
+            key: 'opt',
+            align: 'center',
+            fixed: 'right',
+            width: 80,
+            render: (_, record) => (
+                <Typography.Link onClick={() => onRemove(record)}>
+                    删除
+                </Typography.Link>
+            )
+        }
+    ] as TableProps<FileInfo>['columns'], [value]);
 
     useEffect(() => {
         const { orderField, orderType } = sortState;

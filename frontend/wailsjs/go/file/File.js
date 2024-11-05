@@ -18,6 +18,10 @@ export function ReadFile(arg1) {
   return window['go']['file']['File']['ReadFile'](arg1);
 }
 
+export function Remove(arg1) {
+  return window['go']['file']['File']['Remove'](arg1);
+}
+
 export function WriteFile(arg1, arg2) {
   return window['go']['file']['File']['WriteFile'](arg1, arg2);
 }

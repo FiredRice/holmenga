@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Card, Flex, Form, Drawer, DrawerProps, Select } from 'antd';
-import { file } from 'wailsjs/go/models';
 import LocalImage from '../LocalImage';
+import { FileInfo } from 'src/types';
 import './style/index.less';
 
 interface IQuickPreviewProps extends DrawerProps {
-    onItemClick?: (v: file.FileInfo, i: number) => void;
+    onItemClick?: (v: FileInfo, i: number) => void;
 }
 
 const QuickPreview: React.FC<IQuickPreviewProps> = React.memo((props) => {
@@ -19,7 +19,7 @@ const QuickPreview: React.FC<IQuickPreviewProps> = React.memo((props) => {
     }, [columnNum]);
 
     const dir = Form.useWatch('dir') || '';
-    const images: file.FileInfo[] = Form.useWatch('images') || [];
+    const images: FileInfo[] = Form.useWatch('images') || [];
 
     return (
         <Drawer

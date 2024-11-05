@@ -10,6 +10,8 @@ export function GetFilesInfo(arg1:string):Promise<Array<file.FileInfo>>;
 
 export function ReadFile(arg1:string):Promise<string>;
 
+export function Remove(arg1:string):Promise<void>;
+
 export function WriteFile(arg1:string,arg2:string):Promise<void>;
 
 export function ZipFolder(arg1:file.ZipConfig):Promise<void>;

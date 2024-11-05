@@ -16,3 +16,7 @@ type WindowsStore struct {
 	IsMaximise bool  `json:"isMaximise"`
 	Log        bool  `json:"log"`
 }
+
+type Config struct {
+	ScrollAnim bool `json:"scrollAnim"`
+}

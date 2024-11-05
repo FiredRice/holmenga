@@ -6,6 +6,10 @@ export function Context() {
   return window['go']['core']['App']['Context']();
 }
 
+export function GetConfig() {
+  return window['go']['core']['App']['GetConfig']();
+}
+
 export function ScreenResolution() {
   return window['go']['core']['App']['ScreenResolution']();
 }

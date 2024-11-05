@@ -10,17 +10,26 @@ import (
 
 // App struct
 type App struct {
-	ctx   context.Context
-	store *store.Store
+	ctx    context.Context
+	store  *store.Store
+	config *store.Config
 }
 
 // NewApp creates a new App application struct
 func New() *App {
-	store, err := store.NewStore()
+	appStore, err := store.NewStore()
 	if err != nil {
 		println(err.Error())
 	}
-	return &App{store: store}
+	config, err := store.NewConfig()
+	if err != nil {
+		println(err.Error())
+	}
+
+	return &App{
+		store:  appStore,
+		config: config,
+	}
 }
 
 func (a *App) Context() *context.Context {
@@ -31,6 +40,7 @@ func (a *App) Context() *context.Context {
 // so we can call the runtime methods
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
+	// 加载配置
 	a.loadConfig()
 }
 
@@ -58,6 +68,10 @@ func (a *App) ScreenResolution() *screenresolution.Resolution {
 	return screenresolution.GetPrimary()
 }
 
+func (a *App) GetConfig() *store.Config {
+	return a.config
+}
+
 func (a *App) BeforeClose(ctx context.Context) bool {
 	isMaximised := runtime.WindowIsMaximised(ctx)
 	a.store.SetIsMaximise(isMaximised)
@@ -66,6 +80,10 @@ func (a *App) BeforeClose(ctx context.Context) bool {
 	width, height := runtime.WindowGetSize(ctx)
 	a.store.SetSize(width, height)
 	err := a.store.Save()
+	if err != nil {
+		runtime.LogInfo(ctx, err.Error())
+	}
+	err = a.config.Save()
 	if err != nil {
 		runtime.LogInfo(ctx, err.Error())
 	}

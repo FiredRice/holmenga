@@ -4,12 +4,12 @@ import { OpenDirectory } from 'wailsjs/go/dialog/Dialog';
 import { useSafeState } from 'ahooks';
 import { PathExists, Dir } from 'wailsjs/go/path/Path';
 import { GetFilesInfo } from 'wailsjs/go/file/File';
-import { file } from 'wailsjs/go/models';
+import { FileInfo } from 'src/types';
 
 interface IPathSelectProps {
     value?: string;
     onChange?: (value: string) => void;
-    onLoadSuccess?: (files: file.FileInfo[]) => void;
+    onLoadSuccess?: (files: FileInfo[]) => void;
     children?: ReactNode;
 }
 

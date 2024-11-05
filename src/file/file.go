@@ -42,6 +42,10 @@ func (f *File) ReadFile(path string) (string, error) {
 	return string(content), nil
 }
 
+func (f *File) Remove(path string) error {
+	return os.Remove(path)
+}
+
 type FileInfo struct {
 	Name           string
 	Size           int64

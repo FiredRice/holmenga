@@ -27,6 +27,7 @@ func main() {
 		Height:    600,
 		MinWidth:  640,
 		MinHeight: 480,
+		Menu:      core.NewMenu(app),
 		AssetServer: &assetserver.Options{
 			Assets:  assets,
 			Handler: file.NewFileLoader(),
