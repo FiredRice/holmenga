@@ -25,7 +25,12 @@ const EditableCell: React.FC<IEditableCellProps> = (props) => {
     }
 
     function save(e: any) {
-        const v = parseInt(e?.target?.value);
+        const value = e?.target?.value;
+        if (!value) {
+            toggleEdit();
+            return;
+        }
+        const v = parseInt(value);
         if (isNaN(v)) {
             message.warning('请输入数字');
             return;
